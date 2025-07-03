@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Electric of Tucson - Time Off Request</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '⚡';
+            position: absolute;
+            top: 15px;
+            left: 30px;
+            font-size: 2em;
+            opacity: 0.3;
+        }
+        
+        .header::after {
+            content: '⚡';
+            position: absolute;
+            top: 15px;
+            right: 30px;
+            font-size: 2em;
+            opacity: 0.3;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .form-container {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-row {
+            display: -ms-grid;
+            display: grid;
+            -ms-grid-columns: 1fr 20px 1fr;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-row > *:nth-child(1) { -ms-grid-column: 1; }
+        .form-row > *:nth-child(2) { -ms-grid-column: 3; }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .required {
+            color: #ff6b35;
+        }
+        
+        input[type="text"], 
+        input[type="date"], 
+        input[type="number"], 
+        input[type="time"],
+        select, 
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            font-family: inherit;
+        }
+        
+        input:focus, 
+        select:focus, 
+        textarea:focus {
+            outline: none;
+            border-color: #ff6b35;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+        
+        input:invalid {
+            border-color: #ef4444;
+        }
+        
+        input:invalid:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        .radio-group {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            gap: 25px;
+            margin-top: 10px;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+        }
+        
+        .radio-item {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            min-width: 120px;
+        }
+        
+        .radio-item:hover {
+            border-color: #ff6b35;
+            background: white;
+        }
+        
+        .radio-item.selected {
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.05);
+        }
+        
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+        
+        /* Custom radio button styling for better browser support */
+        input[type="radio"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            background: white;
+            position: relative;
+        }
+        
+        input[type="radio"]:checked {
+            border-color: #ff6b35;
+            background: #ff6b35;
+        }
+        
+        input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+            transform: translate(-50%, -50%);
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            font-family: inherit;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .loading {
+            background: #f3f4f6;
+            color: #374151;
+            text-align: center;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+        
+        .error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+        }
+        
+        .validation-error {
+            color: #ef4444;
+            font-size: 0.875em;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #374151;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .section-title:first-child {
+            margin-top: 0;
+        }
+        
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Focus indicators for keyboard navigation */
+        *:focus {
+            outline: 2px solid #ff6b35;
+            outline-offset: 2px;
+        }
+        
+        .radio-item:focus-within {
+            outline: 2px solid #ff6b35;
+            outline-offset: 2px;
+        }
+        
+        /* Media queries with fallbacks */
+        @media screen and (max-width: 768px) {
+            .form-row {
+                -ms-grid-columns: 1fr;
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                -webkit-box-orient: vertical;
+                -webkit-box-direction: normal;
+                -ms-flex-direction: column;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 25px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .header::before,
+            .header::after {
+                font-size: 1.5em;
+                top: 10px;
+            }
+            
+            .header::before {
+                left: 20px;
+            }
+            
+            .header::after {
+                right: 20px;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .submit-btn {
+                font-size: 1.1em;
+                padding: 16px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Mr. Electric of Tucson</h1>
+            <p>Employee Time Off Request System</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="timeOffForm" novalidate>
+                <div class="section-title">Employee Information</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Employee Name <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" required minlength="2" maxlength="50">
+                        <div class="validation-error" id="nameError">Please enter a valid name (2-50 characters)</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="requestDate">Request Submission Date <span class="required">*</span></label>
+                        <input type="date" id="requestDate" name="requestDate" required>
+                        <div class="validation-error" id="requestDateError">Please select a valid date</div>
+                    </div>
+                </div>
+                
+                <div class="section-title">Request Details</div>
+                
+                <div class="form-group">
+                    <label>Request Type <span class="required">*</span></label>
+                    <div class="radio-group" role="radiogroup" aria-labelledby="requestTypeLabel">
+                        <div class="radio-item">
+                            <input type="radio" id="absence" name="type" value="absence" required aria-describedby="requestTypeLabel">
+                            <label for="absence">Full Day Absence</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="tardy" name="type" value="tardy" required aria-describedby="requestTypeLabel">
+                            <label for="tardy">Partial Day / Tardy</label>
+                        </div>
+                    </div>
+                    <div class="validation-error" id="typeError">Please select a request type</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">Start Date <span class="required">*</span></label>
+                        <input type="date" id="startDate" name="startDate" required>
+                        <div class="validation-error" id="startDateError">Please select a valid start date</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date (if multi-day)</label>
+                        <input type="date" id="endDate" name="endDate">
+                        <div class="validation-error" id="endDateError">End date must be after start date</div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <select id="startTime" name="startTime">
+                            <option value="7:00 AM">7:00 AM</option>
+                            <option value="8:00 AM" selected>8:00 AM</option>
+                            <option value="12:00 PM">12:00 PM</option>
+                            <option value="4:00 PM">4:00 PM</option>
+                            <option value="Other">Other (specify in reason)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hours">Total Hours <span class="required">*</span></label>
+                        <input type="number" id="hours" name="hours" step="0.25" min="0.25" max="24" required>
+                        <div class="validation-error" id="hoursError">Please enter hours between 0.25 and 24</div>
+                    </div>
+                </div>
+                
+                <div class="section-title">Time Off Category</div>
+                
+                <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <div class="radio-group" role="radiogroup" aria-labelledby="categoryLabel">
+                        <div class="radio-item">
+                            <input type="radio" id="unpaid" name="category" value="unpaid" required aria-describedby="categoryLabel">
+                            <label for="unpaid">Unpaid Time Off</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="sick" name="category" value="sick" required aria-describedby="categoryLabel">
+                            <label for="sick">Sick Leave</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="vacation" name="category" value="vacation" required aria-describedby="categoryLabel">
+                            <label for="vacation">Vacation / PTO</label>
+                        </div>
+                    </div>
+                    <div class="validation-error" id="categoryError">Please select a time off category</div>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Important:</strong> Vacation/PTO is only available for employees with 1+ years of service. All requests require management approval through ADP.
+                </div>
+                
+                <div class="info-box">
+                    <strong>ℹ️ Note:</strong> This form will automatically email your request to management for processing in the ADP system. You'll receive a confirmation once submitted.
+                </div>
+                
+                <div class="form-group">
+                    <label for="reason">Reason for Request <span class="required">*</span></label>
+                    <textarea id="reason" name="reason" rows="4" required minlength="5" maxlength="500" placeholder="Please provide a brief explanation for your time off request..."></textarea>
+                    <div class="validation-error" id="reasonError">Please provide a reason (5-500 characters)</div>
+                </div>
+                
+                <div class="message loading" id="loadingMessage">
+                    <p>📧 Sending your request...</p>
+                </div>
+                
+                <div class="message success" id="successMessage">
+                    <p>✅ Your time off request has been successfully submitted! Management will review and process it in ADP.</p>
+                </div>
+                
+                <div class="message error" id="errorMessage">
+                    <p>❌ There was an error submitting your request. Please try again or contact management directly.</p>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">Submit Time Off Request</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        (function() {
+            'use strict';
+            
+            // Initialize EmailJS with error handling
+            function initializeEmailJS() {
+                return new Promise((resolve, reject) => {
+                    if (typeof emailjs === 'undefined') {
+                        reject(new Error('EmailJS library not loaded'));
+                        return;
+                    }
+                    
+                    try {
+                        emailjs.init('Istz4CM-PZQqIZPFY');
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+            
+            // Wait for page to load completely before initializing EmailJS
+            let emailJSReady = false;
+            
+            function waitForEmailJS() {
+                if (typeof emailjs !== 'undefined') {
+                    initializeEmailJS()
+                        .then(() => {
+                            emailJSReady = true;
+                            console.log('EmailJS initialized successfully');
+                        })
+                        .catch((error) => {
+                            console.error('EmailJS initialization failed:', error);
+                            emailJSReady = false;
+                        });
+                } else {
+                    // Retry after a short delay
+                    setTimeout(waitForEmailJS, 100);
+                }
+            }
+            
+            // Start initialization
+            waitForEmailJS();
+            
+            // Set today's date as default
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
+            document.getElementById('requestDate').value = todayString;
+            
+            // Set minimum date for start date (allow 30 days in past)
+            const minDate = new Date();
+            minDate.setDate(minDate.getDate() - 30);
+            const minDateString = minDate.toISOString().split('T')[0];
+            document.getElementById('startDate').setAttribute('min', minDateString);
+            
+            // Set maximum date (1 year in future)
+            const maxDate = new Date();
+            maxDate.setFullYear(maxDate.getFullYear() + 1);
+            const maxDateString = maxDate.toISOString().split('T')[0];
+            document.getElementById('startDate').setAttribute('max', maxDateString);
+            document.getElementById('endDate').setAttribute('max', maxDateString);
+            
+            // Utility functions
+            function showError(fieldId, message) {
+                const errorElement = document.getElementById(fieldId + 'Error');
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            }
+            
+            function hideError(fieldId) {
+                const errorElement = document.getElementById(fieldId + 'Error');
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            }
+            
+            function hideAllErrors() {
+                const errorElements = document.querySelectorAll('.validation-error');
+                errorElements.forEach(function(element) {
+                    element.style.display = 'none';
+                });
+            }
+            
+            function sanitizeInput(input) {
+                return input.replace(/[<>]/g, '');
+            }
+            
+            function showMessage(type) {
+                // Hide all messages first
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+                
+                // Show the requested message
+                const messageElement = document.getElementById(type + 'Message');
+                if (messageElement) {
+                    messageElement.style.display = 'block';
+                }
+            }
+            
+            // Form validation functions
+            function validateName(name) {
+                return name && name.length >= 2 && name.length <= 50;
+            }
+            
+            function validateDate(dateString) {
+                if (!dateString) return false;
+                const date = new Date(dateString);
+                const now = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(now.getDate() - 30);
+                const oneYearFromNow = new Date();
+                oneYearFromNow.setFullYear(now.getFullYear() + 1);
+                
+                return date >= thirtyDaysAgo && date <= oneYearFromNow;
+            }
+            
+            function validateHours(hours) {
+                const num = parseFloat(hours);
+                return !isNaN(num) && num >= 0.25 && num <= 24;
+            }
+            
+            function validateReason(reason) {
+                return reason && reason.length >= 5 && reason.length <= 500;
+            }
+            
+            // Handle radio button styling
+            function handleRadioSelection() {
+                document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                        const groupName = this.name;
+                        // Remove selected class from all radio items in the same group
+                        document.querySelectorAll('input[name="' + groupName + '"]').forEach(function(r) {
+                            const radioItem = r.closest('.radio-item');
+                            if (radioItem) {
+                                radioItem.classList.remove('selected');
+                            }
+                        });
+                        // Add selected class to current item
+                        const currentItem = this.closest('.radio-item');
+                        if (currentItem) {
+                            currentItem.classList.add('selected');
+                        }
+                        
+                        // Hide validation error for this group
+                        hideError(groupName);
+                    });
+                });
+            }
+            
+            // Initialize radio button handling
+            handleRadioSelection();
+            
+            // Auto-calculate end date for single day requests
+            document.getElementById('startDate').addEventListener('change', function() {
+                const endDateField = document.getElementById('endDate');
+                const startDate = new Date(this.value);
+                
+                // Set minimum end date to start date
+                endDateField.setAttribute('min', this.value);
+                
+                // If no end date is set, default to same as start date
+                if (!endDateField.value) {
+                    endDateField.value = this.value;
+                }
+                
+                // Validate date
+                if (validateDate(this.value)) {
+                    hideError('startDate');
+                } else {
+                    showError('startDate', 'Please select a date within the allowed range');
+                }
+            });
+            
+            // Validate end date when changed
+            document.getElementById('endDate').addEventListener('change', function() {
+                const startDate = document.getElementById('startDate').value;
+                if (startDate && this.value && new Date(this.value) < new Date(startDate)) {
+                    showError('endDate', 'End date must be after start date');
+                } else {
+                    hideError('endDate');
+                }
+            });
+            
+            // Smart hour suggestions based on request type
+            document.querySelectorAll('input[name="type"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const hoursField = document.getElementById('hours');
+                    if (this.value === 'absence') {
+                        hoursField.value = '8';
+                    } else if (this.value === 'tardy') {
+                        hoursField.value = '2';
+                    }
+                });
+            });
+            
+            // Real-time validation
+            document.getElementById('name').addEventListener('blur', function() {
+                if (!validateName(this.value.trim())) {
+                    showError('name', 'Please enter a valid name (2-50 characters)');
+                } else {
+                    hideError('name');
+                }
+            });
+            
+            document.getElementById('hours').addEventListener('blur', function() {
+                if (!validateHours(this.value)) {
+                    showError('hours', 'Please enter hours between 0.25 and 24');
+                } else {
+                    hideError('hours');
+                }
+            });
+            
+            document.getElementById('reason').addEventListener('blur', function() {
+                if (!validateReason(this.value.trim())) {
+                    showError('reason', 'Please provide a reason (5-500 characters)');
+                } else {
+                    hideError('reason');
+                }
+            });
+            
+            // Prevent double submission
+            let isSubmitting = false;
+            
+            // Handle form submission
+            document.getElementById('timeOffForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Prevent double submission
+                if (isSubmitting) {
+                    return;
+                }
+                
+                hideAllErrors();
+                
+                const formData = new FormData(this);
+                const data = {};
+                
+                // Collect and sanitize form data
+                for (let [key, value] of formData.entries()) {
+                    data[key] = sanitizeInput(value.toString().trim());
+                }
+                
+                // Comprehensive validation
+                let isValid = true;
+                
+                if (!validateName(data.name)) {
+                    showError('name', 'Please enter a valid name (2-50 characters)');
+                    isValid = false;
+                }
+                
+                if (!data.requestDate) {
+                    showError('requestDate', 'Please select a request date');
+                    isValid = false;
+                }
+                
+                if (!data.type) {
+                    showError('type', 'Please select a request type');
+                    isValid = false;
+                }
+                
+                if (!validateDate(data.startDate)) {
+                    showError('startDate', 'Please select a valid start date');
+                    isValid = false;
+                }
+                
+                if (data.endDate && new Date(data.endDate) < new Date(data.startDate)) {
+                    showError('endDate', 'End date must be after start date');
+                    isValid = false;
+                }
+                
+                if (!validateHours(data.hours)) {
+                    showError('hours', 'Please enter hours between 0.25 and 24');
+                    isValid = false;
+                }
+                
+                if (!data.category) {
+                    showError('category', 'Please select a time off category');
+                    isValid = false;
+                }
+                
+                if (!validateReason(data.reason)) {
+                    showError('reason', 'Please provide a reason (5-500 characters)');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    // Focus on first error field
+                    const firstError = document.querySelector('.validation-error[style*="block"]');
+                    if (firstError) {
+                        const fieldId = firstError.id.replace('Error', '');
+                        const field = document.getElementById(fieldId) || document.querySelector('input[name="' + fieldId + '"]');
+                        if (field) {
+                            field.focus();
+                        }
+                    }
+                    return;
+                }
+                
+                // Vacation eligibility check
+                if (data.category === 'vacation') {
+                    if (!confirm('Please confirm that ' + data.name + ' has 1+ years of service for vacation eligibility.\n\nClick OK to confirm and proceed, or Cancel to review.')) {
+                        return;
+                    }
+                }
+                
+                // Set submission flag
+                isSubmitting = true;
+                
+                // Show loading state
+                showMessage('loading');
+                document.getElementById('submitBtn').disabled = true;
+                
+                // Prepare email template parameters
+                const templateParams = {
+                    employee_name: data.name,
+                    request_date: data.requestDate,
+                    request_type: data.type.charAt(0).toUpperCase() + data.type.slice(1),
+                    start_date: data.startDate,
+                    end_date: data.endDate || 'Same day',
+                    start_time: data.startTime,
+                    total_hours: data.hours,
+                    category: data.category.toUpperCase(),
+                    reason: data.reason,
+                    formatted_request: [
+                        'Time Off Request Details:',
+                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+                        '',
+                        'Employee: ' + data.name,
+                        'Request Submitted: ' + data.requestDate,
+                        'Request Type: ' + data.type.charAt(0).toUpperCase() + data.type.slice(1),
+                        '',
+                        'SCHEDULE DETAILS:',
+                        'Start Date: ' + data.startDate,
+                        'End Date: ' + (data.endDate || 'Same day'),
+                        'Start Time: ' + data.startTime,
+                        'Total Hours: ' + data.hours,
+                        '',
+                        'CATEGORY: ' + data.category.toUpperCase(),
+                        data.category === 'vacation' ? '⚠️ VACATION REQUEST - Verify employee has 1+ years service' : '',
+                        '',
+                        'REASON:',
+                        data.reason,
+                        '',
+                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+                        'Please process this request in ADP system.'
+                    ].filter(Boolean).join('\n')
+                };
+                
+                // Check if EmailJS is ready
+                if (!emailJSReady) {
+                    console.error('EmailJS not available');
+                    showMessage('error');
+                    setTimeout(function() {
+                        showMessage('');
+                        isSubmitting = false;
+                        document.getElementById('submitBtn').disabled = false;
+                    }, 5000);
+                    return;
+                }
+                
+                // Send email using EmailJS
+                emailjs.send('default_service', 'template-617524g', templateParams)
+                    .then(function(response) {
+                        console.log('Email sent successfully:', response.status, response.text);
+                        
+                        // Show success message
+                        showMessage('success');
+                        
+                        // Reset form after successful submission
+                        setTimeout(function() {
+                            document.getElementById('timeOffForm').reset();
+                            document.getElementById('requestDate').value = todayString;
+                            document.querySelectorAll('.radio-item').forEach(function(item) {
+                                item.classList.remove('selected');
+                            });
+                            showMessage('');
+                            isSubmitting = false;
+                            document.getElementById('submitBtn').disabled = false;
+                        }, 4000);
+                        
+                    })
+                    .catch(function(error) {
+                        console.error('Email send failed:', error);
+                        
+                        // Show error message
+                        showMessage('error');
+                        
+                        // Re-enable form after error
+                        setTimeout(function() {
+                            showMessage('');
+                            isSubmitting = false;
+                            document.getElementById('submitBtn').disabled = false;
+                        }, 5000);
+                    });
+            });
+            
+            // Initialize form on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                // Focus on first field for better UX
+                document.getElementById('name').focus();
+            });
+            
+        })();
+    </script>
+</body>
+</html>
