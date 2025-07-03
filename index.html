@@ -4,7 +4,310 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr. Electric of Tucson - Time Off Request</title>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        // Comprehensive debugging system - renamed from 'debugger' to avoid reserved keyword
+        const logger = {
+            logs: [],
+            
+            log: function(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                this.logs.push({message: logEntry, type: type});
+                console.log(`%c${logEntry}`, this.getConsoleColor(type));
+                this.updateDebugPanel();
+            },
+            
+            getConsoleColor: function(type) {
+                const colors = {
+                    info: 'color: #00aaff',
+                    success: 'color: #00ff00', 
+                    warning: 'color: #ffaa00',
+                    error: 'color: #ff4444'
+                };
+                return colors[type] || colors.info;
+            },
+            
+            updateDebugPanel: function() {
+                const logElement = document.getElementById('debugLog');
+                if (logElement) {
+                    logElement.innerHTML = this.logs.slice(-20).map(log => 
+                        `<div class="debug-${log.type}">${log.message}</div>`
+                    ).join('');
+                    logElement.scrollTop = logElement.scrollHeight;
+                }
+            },
+            
+            updateStatus: function(element, message, type) {
+                const el = document.getElementById(element);
+                if (el) {
+                    el.className = `debug-status debug-${type}`;
+                    el.innerHTML = message;
+                }
+            }
+        };
+        
+        // Global functions for debug panel
+        window.toggleDebugger = function() {
+            const panel = document.getElementById('debugPanel');
+            const toggle = document.querySelector('.debug-toggle');
+            if (panel && toggle) {
+                if (panel.style.display === 'none' || !panel.style.display) {
+                    panel.style.display = 'block';
+                    toggle.textContent = '❌ Close';
+                    runEnvironmentChecks();
+                } else {
+                    panel.style.display = 'none';
+                    toggle.textContent = '🐛 Debug';
+                }
+            }
+        };
+        
+        window.runDiagnostics = function() {
+            logger.logs = [];
+            runEnvironmentChecks();
+            
+            // Additional comprehensive tests
+            setTimeout(() => {
+                logger.log('=== Comprehensive Diagnostics ===', 'info');
+                logger.log(`Screen: ${screen.width}x${screen.height}`, 'info');
+                logger.log(`Viewport: ${window.innerWidth}x${window.innerHeight}`, 'info');
+                logger.log(`Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`, 'info');
+                logger.log(`Language: ${navigator.language}`, 'info');
+                logger.log(`Cookies enabled: ${navigator.cookieEnabled}`, 'info');
+                logger.log(`Local storage: ${typeof Storage !== 'undefined'}`, 'info');
+                logger.log('=== Diagnostics Complete ===', 'info');
+            }, 2000);
+        };
+        
+        function runEnvironmentChecks() {
+            logger.log('=== Environment Diagnostics Started ===', 'info');
+            
+            // Check basic environment
+            logger.log(`User Agent: ${navigator.userAgent}`, 'info');
+            logger.log(`Page URL: ${window.location.href}`, 'info');
+            logger.log(`Protocol: ${window.location.protocol}`, 'info');
+            logger.log(`Domain: ${window.location.hostname}`, 'info');
+            
+            // Check if we're in an iframe/artifact
+            if (window !== window.parent) {
+                logger.log('⚠️ Running inside iframe/artifact - CDN requests may be blocked', 'warning');
+                logger.updateStatus('envStatus', 'Environment: Iframe/Artifact (CDN Blocked)', 'warning');
+            } else {
+                logger.log('✅ Running in main window', 'success');
+                logger.updateStatus('envStatus', 'Environment: Main Window', 'success');
+            }
+            
+            // Check HTTPS
+            if (window.location.protocol === 'https:') {
+                logger.log('✅ HTTPS connection detected', 'success');
+            } else {
+                logger.log('⚠️ HTTP connection - may cause issues', 'warning');
+            }
+            
+            // Test other components
+            testForAdBlockers();
+            testNetworkConnectivity();
+            testEmailJSAvailability();
+            testMailtoSupport();
+        }
+        
+        function testForAdBlockers() {
+            try {
+                const testAd = document.createElement('div');
+                testAd.innerHTML = '&nbsp;';
+                testAd.className = 'adsbox';
+                testAd.style.position = 'absolute';
+                testAd.style.left = '-10000px';
+                document.body.appendChild(testAd);
+                
+                setTimeout(() => {
+                    try {
+                        if (testAd.offsetHeight === 0) {
+                            logger.log('⚠️ Ad blocker detected - may block external scripts', 'warning');
+                        } else {
+                            logger.log('✅ No ad blocker interference detected', 'success');
+                        }
+                        document.body.removeChild(testAd);
+                    } catch (e) {
+                        logger.log('⚠️ Ad blocker test inconclusive', 'warning');
+                    }
+                }, 100);
+            } catch (error) {
+                logger.log('⚠️ Could not test for ad blockers: ' + error.message, 'warning');
+            }
+        }
+        
+        function testNetworkConnectivity() {
+            logger.log('Testing network connectivity...', 'info');
+            
+            // Test basic connectivity
+            if (navigator.onLine) {
+                logger.log('✅ Browser reports online status', 'success');
+                logger.updateStatus('networkStatus', 'Network: Online', 'success');
+            } else {
+                logger.log('❌ Browser reports offline status', 'error');
+                logger.updateStatus('networkStatus', 'Network: Offline', 'error');
+                return;
+            }
+            
+            // Test external resource loading
+            try {
+                const testImg = new Image();
+                testImg.onload = () => {
+                    logger.log('✅ External resource loading works', 'success');
+                    logger.updateStatus('networkStatus', 'Network: External Access OK', 'success');
+                };
+                testImg.onerror = () => {
+                    logger.log('❌ External resource loading blocked', 'error');
+                    logger.updateStatus('networkStatus', 'Network: External Access Blocked', 'error');
+                };
+                testImg.src = 'https://cdn.jsdelivr.net/favicon.ico?' + Date.now();
+            } catch (error) {
+                logger.log('❌ Network test failed: ' + error.message, 'error');
+                logger.updateStatus('networkStatus', 'Network: Test Failed', 'error');
+            }
+        }
+        
+        function testEmailJSAvailability() {
+            logger.log('Testing EmailJS availability...', 'info');
+            
+            if (typeof emailjs !== 'undefined') {
+                logger.log('✅ EmailJS already loaded', 'success');
+                logger.updateStatus('emailjsStatus', 'EmailJS: Available', 'success');
+                testEmailJSFunctionality();
+            } else {
+                logger.log('EmailJS not loaded, attempting dynamic load...', 'info');
+                loadEmailJSForTesting();
+            }
+        }
+        
+        function loadEmailJSForTesting() {
+            try {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+                script.onload = () => {
+                    logger.log('✅ EmailJS test load successful', 'success');
+                    logger.updateStatus('emailjsStatus', 'EmailJS: Test Load OK', 'success');
+                    testEmailJSFunctionality();
+                };
+                script.onerror = (error) => {
+                    logger.log('❌ EmailJS test load failed', 'error');
+                    logger.updateStatus('emailjsStatus', 'EmailJS: Test Load Failed', 'error');
+                    
+                    // Try fallback CDN
+                    logger.log('Trying fallback CDN for test...', 'info');
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.src = 'https://unpkg.com/@emailjs/browser@4/dist/email.min.js';
+                    fallbackScript.onload = () => {
+                        logger.log('✅ EmailJS fallback test load successful', 'success');
+                        logger.updateStatus('emailjsStatus', 'EmailJS: Fallback Test OK', 'success');
+                        testEmailJSFunctionality();
+                    };
+                    fallbackScript.onerror = () => {
+                        logger.log('❌ All EmailJS test CDNs failed', 'error');
+                        logger.updateStatus('emailjsStatus', 'EmailJS: All Test CDNs Failed', 'error');
+                    };
+                    document.head.appendChild(fallbackScript);
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                logger.log('❌ EmailJS test loading error: ' + error.message, 'error');
+                logger.updateStatus('emailjsStatus', 'EmailJS: Load Error', 'error');
+            }
+        }
+        
+        function testEmailJSFunctionality() {
+            if (typeof emailjs === 'undefined') {
+                logger.log('❌ EmailJS object not available for testing', 'error');
+                return;
+            }
+            
+            try {
+                emailjs.init({
+                    publicKey: 'Istz4CM-PZQqIZPFY'
+                });
+                logger.log('✅ EmailJS test initialization successful', 'success');
+                
+            } catch (error) {
+                logger.log('❌ EmailJS test initialization failed: ' + error.message, 'error');
+                logger.updateStatus('emailjsStatus', 'EmailJS: Test Init Failed', 'error');
+            }
+        }
+        
+        function testMailtoSupport() {
+            logger.log('Testing mailto functionality...', 'info');
+            
+            try {
+                const testMailto = 'mailto:test@example.com';
+                const link = document.createElement('a');
+                link.href = testMailto;
+                
+                if (link.protocol === 'mailto:') {
+                    logger.log('✅ Mailto protocol supported', 'success');
+                    logger.updateStatus('mailtoStatus', 'Mailto: Supported', 'success');
+                } else {
+                    logger.log('❌ Mailto protocol not supported', 'error');
+                    logger.updateStatus('mailtoStatus', 'Mailto: Not Supported', 'error');
+                }
+                
+                // Test email client detection
+                if (navigator.userAgent.includes('Mobile')) {
+                    logger.log('📱 Mobile device detected - mailto should work', 'info');
+                } else {
+                    logger.log('💻 Desktop detected - mailto depends on email client', 'info');
+                }
+                
+            } catch (error) {
+                logger.log('❌ Mailto test failed: ' + error.message, 'error');
+                logger.updateStatus('mailtoStatus', 'Mailto: Test Failed', 'error');
+            }
+        }
+        
+        // EmailJS loading system
+        logger.log('Starting EmailJS loading process...', 'info');
+        
+        function loadEmailJSScript() {
+            return new Promise((resolve, reject) => {
+                logger.log('Attempting primary CDN: cdn.jsdelivr.net', 'info');
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+                script.onload = () => {
+                    logger.log('✅ Primary CDN loaded successfully', 'success');
+                    resolve();
+                };
+                script.onerror = (error) => {
+                    logger.log('❌ Primary CDN failed', 'error');
+                    
+                    // Try fallback CDN
+                    logger.log('Attempting fallback CDN: unpkg.com', 'info');
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.src = 'https://unpkg.com/@emailjs/browser@4/dist/email.min.js';
+                    fallbackScript.onload = () => {
+                        logger.log('✅ Fallback CDN loaded successfully', 'success');
+                        resolve();
+                    };
+                    fallbackScript.onerror = (fallbackError) => {
+                        logger.log('❌ Fallback CDN failed', 'error');
+                        reject(new Error('All CDNs failed'));
+                    };
+                    document.head.appendChild(fallbackScript);
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Store the loading promise globally
+        window.emailJSLoading = loadEmailJSScript();
+        
+        // Auto-start basic environment checks when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (document.getElementById('debugPanel')) {
+                    runEnvironmentChecks();
+                }
+            }, 500);
+        });
+    </script>
     <style>
         * {
             margin: 0;
@@ -291,6 +594,62 @@
             border-bottom: 2px solid #f3f4f6;
         }
         
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 350px;
+            max-height: 80vh;
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .debug-panel h4 {
+            color: #ff6b35;
+            margin: 0 0 10px 0;
+            font-size: 12px;
+        }
+        
+        .debug-log {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+            padding: 5px;
+        }
+        
+        .debug-status {
+            margin-bottom: 8px;
+            padding: 3px 0;
+        }
+        
+        .debug-success { color: #00ff00; }
+        .debug-warning { color: #ffaa00; }
+        .debug-error { color: #ff4444; }
+        .debug-info { color: #00aaff; }
+        
+        .debug-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            z-index: 10000;
+        }
+        
         .section-title:first-child {
             margin-top: 0;
         }
@@ -382,6 +741,22 @@
     </style>
 </head>
 <body>
+    <button class="debug-toggle" onclick="toggleDebugger()">🐛 Debug</button>
+    
+    <div class="debug-panel" id="debugPanel">
+        <h4>🔍 Mr. Electric Form Debugger</h4>
+        
+        <div class="debug-status" id="envStatus">Environment: Checking...</div>
+        <div class="debug-status" id="emailjsStatus">EmailJS: Not tested</div>
+        <div class="debug-status" id="mailtoStatus">Mailto: Not tested</div>
+        <div class="debug-status" id="networkStatus">Network: Not tested</div>
+        
+        <h4>📋 Debug Log</h4>
+        <div class="debug-log" id="debugLog"></div>
+        
+        <button onclick="runDiagnostics()" style="background: #333; color: white; border: 1px solid #666; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 10px;">Run Full Diagnostics</button>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Mr. Electric of Tucson</h1>
@@ -479,7 +854,7 @@
                 </div>
                 
                 <div class="info-box">
-                    <strong>ℹ️ Note:</strong> This form will automatically email your request to management for processing in the ADP system. You'll receive a confirmation once submitted.
+                    <strong>ℹ️ How it works:</strong> This form will attempt to send your request directly via email. If that's not available, it will open your email client with a pre-filled message. Either way, your request will reach management for ADP processing.
                 </div>
                 
                 <div class="form-group">
@@ -509,45 +884,164 @@
         (function() {
             'use strict';
             
-            // Initialize EmailJS with error handling
-            function initializeEmailJS() {
-                return new Promise((resolve, reject) => {
-                    if (typeof emailjs === 'undefined') {
-                        reject(new Error('EmailJS library not loaded'));
-                        return;
-                    }
-                    
-                    try {
-                        emailjs.init('Istz4CM-PZQqIZPFY');
-                        resolve();
-                    } catch (error) {
-                        reject(error);
-                    }
-                });
-            }
-            
-            // Wait for page to load completely before initializing EmailJS
+            // Initialize EmailJS with comprehensive debugging
             let emailJSReady = false;
             
-            function waitForEmailJS() {
-                if (typeof emailjs !== 'undefined') {
-                    initializeEmailJS()
+            function initEmailJS() {
+                logger.log('Initializing EmailJS...', 'info');
+                
+                // Use the global loading promise
+                if (window.emailJSLoading) {
+                    window.emailJSLoading
                         .then(() => {
-                            emailJSReady = true;
-                            console.log('EmailJS initialized successfully');
+                            if (typeof emailjs !== 'undefined') {
+                                try {
+                                    emailjs.init({
+                                        publicKey: 'Istz4CM-PZQqIZPFY'
+                                    });
+                                    emailJSReady = true;
+                                    logger.log('✅ EmailJS initialized successfully', 'success');
+                                    logger.updateStatus('emailjsStatus', 'EmailJS: Ready', 'success');
+                                } catch (error) {
+                                    logger.log('❌ EmailJS initialization failed: ' + error.message, 'error');
+                                    logger.updateStatus('emailjsStatus', 'EmailJS: Init Failed', 'error');
+                                    emailJSReady = false;
+                                }
+                            } else {
+                                logger.log('❌ EmailJS object not available after script load', 'error');
+                                logger.updateStatus('emailjsStatus', 'EmailJS: Object Missing', 'error');
+                                emailJSReady = false;
+                            }
                         })
                         .catch((error) => {
-                            console.error('EmailJS initialization failed:', error);
+                            logger.log('❌ EmailJS loading failed: ' + error.message, 'error');
+                            logger.updateStatus('emailjsStatus', 'EmailJS: Load Failed', 'error');
                             emailJSReady = false;
                         });
                 } else {
-                    // Retry after a short delay
-                    setTimeout(waitForEmailJS, 100);
+                    logger.log('❌ EmailJS loading promise not available', 'error');
+                    logger.updateStatus('emailjsStatus', 'EmailJS: No Loading Promise', 'error');
+                    emailJSReady = false;
                 }
             }
             
-            // Start initialization
-            waitForEmailJS();
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initEmailJS);
+            } else {
+                initEmailJS();
+            }
+            
+                // Enhanced fallback mailto function with debugging
+                function sendMailtoFallback(data) {
+                    logger.log('Attempting mailto fallback...', 'info');
+                    
+                    try {
+                        const emailBody = [
+                            'Mr. Electric of Tucson - Time Off Request',
+                            '',
+                            '═══════════════════════════════════════',
+                            'EMPLOYEE INFORMATION',
+                            '═══════════════════════════════════════',
+                            'Employee Name: ' + data.name,
+                            'Request Submitted: ' + data.requestDate,
+                            '',
+                            '═══════════════════════════════════════',
+                            'REQUEST DETAILS',
+                            '═══════════════════════════════════════',
+                            'Request Type: ' + data.type.charAt(0).toUpperCase() + data.type.slice(1),
+                            'Start Date: ' + data.startDate,
+                            'End Date: ' + (data.endDate || 'Same day'),
+                            'Start Time: ' + data.startTime,
+                            'Total Hours: ' + data.hours,
+                            '',
+                            '═══════════════════════════════════════',
+                            'CATEGORY & DETAILS',
+                            '═══════════════════════════════════════',
+                            'Time Off Category: ' + data.category.toUpperCase(),
+                            data.category === 'vacation' ? '⚠️ VACATION REQUEST - Please verify employee has 1+ years of service' : '',
+                            '',
+                            'Reason for Request:',
+                            data.reason,
+                            '',
+                            '═══════════════════════════════════════',
+                            'ACTION REQUIRED',
+                            '═══════════════════════════════════════',
+                            'Please process this request in the ADP system.',
+                            '',
+                            'Submitted via Mr. Electric Time Off Request Form'
+                        ].filter(Boolean).join('\n');
+                        
+                        const subject = 'Time Off Request - ' + data.name + ' - ' + data.startDate;
+                        const mailto = 'mailto:support@mrelectricoftucson.com?subject=' + 
+                            encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody);
+                        
+                        logger.log('Mailto URL length: ' + mailto.length + ' characters', 'info');
+                        logger.log('Attempting to open email client...', 'info');
+                        
+                        // Try to open mailto
+                        window.location.href = mailto;
+                        
+                        // Test if mailto worked by checking if window is still focused
+                        setTimeout(() => {
+                            if (document.hasFocus()) {
+                                logger.log('⚠️ Window still focused - mailto may not have worked', 'warning');
+                                showManualEmailInstructions(data);
+                            } else {
+                                logger.log('✅ Window lost focus - email client likely opened', 'success');
+                                logger.updateStatus('mailtoStatus', 'Mailto: Opened Successfully', 'success');
+                            }
+                        }, 1000);
+                        
+                        return true;
+                        
+                    } catch (error) {
+                        logger.log('❌ Mailto failed: ' + error.message, 'error');
+                        logger.updateStatus('mailtoStatus', 'Mailto: Failed - ' + error.message, 'error');
+                        showManualEmailInstructions(data);
+                        return false;
+                    }
+                }
+                
+                function showManualEmailInstructions(data) {
+                    logger.log('Showing manual email instructions...', 'warning');
+                    
+                    const instructions = document.createElement('div');
+                    instructions.style.cssText = `
+                        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        background: white; padding: 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                        max-width: 500px; max-height: 80vh; overflow-y: auto; z-index: 1000;
+                        border: 2px solid #ff6b35;
+                    `;
+                    instructions.innerHTML = `
+                        <h3 style="color: #ff6b35; margin-bottom: 15px;">📧 Manual Email Required</h3>
+                        <p style="margin-bottom: 15px;"><strong>Both automatic methods failed.</strong><br>Please manually send an email to:</p>
+                        <p style="background: #f3f4f6; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-family: monospace;">
+                            <strong>support@mrelectricoftucson.com</strong>
+                        </p>
+                        <p style="margin-bottom: 10px;"><strong>Subject:</strong> Time Off Request - ${data.name} - ${data.startDate}</p>
+                        <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 12px;">
+                            <strong>Include these details:</strong><br>
+                            • Employee: ${data.name}<br>
+                            • Type: ${data.type}<br>
+                            • Start Date: ${data.startDate}<br>
+                            • Hours: ${data.hours}<br>
+                            • Category: ${data.category}<br>
+                            • Reason: ${data.reason}
+                        </div>
+                        <button onclick="this.parentElement.remove()" style="
+                            background: #ff6b35; color: white; border: none; padding: 10px 20px; 
+                            border-radius: 5px; cursor: pointer; font-weight: 600; margin-right: 10px;
+                        ">Got it!</button>
+                        <button onclick="window.toggleDebugger()" style="
+                            background: #666; color: white; border: none; padding: 10px 20px; 
+                            border-radius: 5px; cursor: pointer; font-weight: 600;
+                        ">View Debug Info</button>
+                    `;
+                    document.body.appendChild(instructions);
+                    
+                    logger.updateStatus('mailtoStatus', 'Mailto: Manual Instructions Shown', 'warning');
+                }
             
             // Set today's date as default
             const today = new Date();
